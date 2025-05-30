@@ -1,0 +1,23 @@
+# Uncomment the next line to define a global platform for your project
+# platform :ios, '9.0'
+
+target 'RSSFeed' do
+  # Comment the next line if you don't want to use dynamic frameworks
+  use_frameworks!
+
+  # Pods for RSSFeed
+  pod 'FeedKit', '~> 9.1.2'        # For RSS feed parsing
+  pod 'Alamofire', '~> 5.8.1'      # For networking
+  pod 'SDWebImage', '~> 5.18.10'   # For image loading and caching
+  pod 'SnapKit', '~> 5.6.0'        # For programmatic UI constraints
+
+  target 'RSSFeedTests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+  target 'RSSFeedUITests' do
+    # Pods for testing
+  end
+
+end
