@@ -6,7 +6,7 @@ target 'RSSFeed' do
   use_frameworks!
 
   # Pods for RSSFeed
-  pod 'FeedKit', '~> 9.1.2'        # For RSS feed parsing
+  pod 'FeedKit', '~> 10.0.1'       # For RSS feed parsing
   pod 'Alamofire', '~> 5.8.1'      # For networking
   pod 'SDWebImage', '~> 5.18.10'   # For image loading and caching
   pod 'SnapKit', '~> 5.6.0'        # For programmatic UI constraints

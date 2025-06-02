@@ -8,7 +8,7 @@ PODS:
 
 DEPENDENCIES:
   - Alamofire (~> 5.8.1)
-  - FeedKit (~> 9.1.2)
+  - FeedKit
   - SDWebImage (~> 5.18.10)
   - SnapKit (~> 5.6.0)
 
@@ -25,6 +25,6 @@ SPEC CHECKSUMS:
   SDWebImage: 2d6d229046fea284d62e36bfb8ebe8287dfc5b10
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
 
-PODFILE CHECKSUM: 715113868bb6fdb22160a16f03e9f6aef491f850
+PODFILE CHECKSUM: 92012bb86b6e6ea84b0a59cb27ef94c510d4b2cb
 
 COCOAPODS: 1.16.2
