@@ -1,6 +1,6 @@
 import FeedKit
 
-final class FeedKitFeedLoader: FeedLoader {
+final class FeedLoaderFeedKit: FeedLoader {
 
     func loadFeed(formUrl urlString: String) async {
         guard let feedURL = URL(string: urlString) else {

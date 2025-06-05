@@ -1,10 +1,10 @@
 protocol FeedConfigurationUseCaseType {
 
-    func addConfiguration(_ configuration: FeedConfigurationViewModel)
+    func addConfiguration(_ configuration: FeedConfiguration)
 
-    func loadConfigurations() -> [FeedConfigurationViewModel]
+    func loadConfigurations() -> [FeedConfiguration]
 
-    func deleteConfiguration(_ configuration: FeedConfigurationViewModel)
+    func deleteConfiguration(_ configuration: FeedConfiguration)
 
-    func editConfiguration(_ configuration: FeedConfigurationViewModel)
+    func editConfiguration(_ configuration: FeedConfiguration)
 }

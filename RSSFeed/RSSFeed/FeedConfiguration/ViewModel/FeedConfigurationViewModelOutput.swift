@@ -1,10 +1,12 @@
 import Combine
 import Foundation
 
-enum FeedConfigurationState {
-    case idle
-    case edit(FeedConfigurationViewModel)
-    case success([FeedConfigurationViewModel])
+typealias FeedConfigurationViewModelOutput = AnyPublisher<FeedConfigurationViewModelState, Never>
+
+enum FeedConfigurationViewModelState: Equatable {
+    case idle([FeedConfiguration])
+    case edit(FeedConfiguration)
+    case success
     case noResults
-    case failure(Error)
+    case failure
 }
