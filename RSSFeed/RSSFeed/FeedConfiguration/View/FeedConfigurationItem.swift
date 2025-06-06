@@ -1,6 +1,6 @@
 import Foundation
 
-struct FeedConfiguration: Equatable {
+struct FeedConfigurationItem: Equatable, Hashable {
 
     let name: String
     let urlString: String

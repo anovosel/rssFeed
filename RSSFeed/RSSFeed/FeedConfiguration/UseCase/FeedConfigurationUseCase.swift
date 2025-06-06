@@ -10,7 +10,7 @@ final class FeedConfigurationUseCase {
 }
 
 extension FeedConfigurationUseCase: FeedConfigurationUseCaseType {
-    func addConfiguration(_ configuration: FeedConfiguration) {
+    func addConfiguration(_ configuration: FeedConfigurationItem) {
         repository
             .saveConfiguration(
                 .init(
@@ -20,7 +20,7 @@ extension FeedConfigurationUseCase: FeedConfigurationUseCaseType {
                     description: configuration.description))
     }
     
-    func loadConfigurations() -> [FeedConfiguration] {
+    func loadConfigurations() -> [FeedConfigurationItem] {
         repository
             .getConfigurations()
             .map { .init(name: "",
@@ -29,7 +29,7 @@ extension FeedConfigurationUseCase: FeedConfigurationUseCaseType {
                          imageURLString: $0.imageUrlString) }
     }
     
-    func deleteConfiguration(_ configuration: FeedConfiguration) {
+    func deleteConfiguration(_ configuration: FeedConfigurationItem) {
         repository
             .deleteConfiguration(
                 .init(
@@ -39,7 +39,7 @@ extension FeedConfigurationUseCase: FeedConfigurationUseCaseType {
                     description: configuration.description))
     }
     
-    func editConfiguration(_ configuration: FeedConfiguration) {
+    func editConfiguration(_ configuration: FeedConfigurationItem) {
     }
     
 

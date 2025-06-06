@@ -4,8 +4,8 @@ import Foundation
 typealias FeedConfigurationViewModelOutput = AnyPublisher<FeedConfigurationViewModelState, Never>
 
 enum FeedConfigurationViewModelState: Equatable {
-    case idle([FeedConfiguration])
-    case edit(FeedConfiguration)
+    case idle([FeedConfigurationItem])
+    case edit(FeedConfigurationItem)
     case success
     case noResults
     case failure
