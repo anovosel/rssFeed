@@ -23,6 +23,7 @@ final class FeedConfigurationLocalRepository: FeedConfigurationRepository {
         FeedConfigurationEntity
             .updateFeedConfiguration(
                 originalUrlString: originalUrlString,
+                newName: newConfiguration.name,
                 newUrlString: newConfiguration.urlString,
                 description: newConfiguration.description,
                 imageUrlString: newConfiguration.imageUrlString)

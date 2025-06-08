@@ -6,5 +6,5 @@ protocol FeedConfigurationUseCaseType {
 
     func deleteConfiguration(_ configuration: FeedConfigurationItem)
 
-    func editConfiguration(_ configuration: FeedConfigurationItem)
+    func update(old: FeedConfigurationItem, new: FeedConfigurationItem)
 }

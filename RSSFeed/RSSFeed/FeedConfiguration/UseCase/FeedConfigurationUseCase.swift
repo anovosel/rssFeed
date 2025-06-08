@@ -23,7 +23,7 @@ extension FeedConfigurationUseCase: FeedConfigurationUseCaseType {
     func loadConfigurations() -> [FeedConfigurationItem] {
         repository
             .getConfigurations()
-            .map { .init(name: "",
+            .map { .init(name: $0.name,
                          urlString: $0.urlString,
                          description: $0.description,
                          imageURLString: $0.imageUrlString) }
@@ -39,7 +39,15 @@ extension FeedConfigurationUseCase: FeedConfigurationUseCaseType {
                     description: configuration.description))
     }
     
-    func editConfiguration(_ configuration: FeedConfigurationItem) {
+    func update(old: FeedConfigurationItem, new: FeedConfigurationItem) {
+        repository
+            .updateConfiguration(
+                originalUrlString: old.urlString,
+                withConfiguration: .init(
+                    name: new.name,
+                    urlString: new.urlString,
+                    imageUrlString: new.imageURLString,
+                    description: new.description))
     }
     
 

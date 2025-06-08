@@ -15,7 +15,7 @@ enum MainTabBarHelper {
                 viewModel: feedConfigurationViewModel))
         feedConfigurationNavigationConroller.tabBarItem = UITabBarItem(tabBarSystemItem: .more, tag: 1)
 
-        // TODO: don't instantiate here
+        // TODO: don't instantiate here and don't hide first -> show empty instead
         if FeedConfigurationLocalRepository().getConfigurations().isEmpty {
             return [feedConfigurationNavigationConroller]
         }

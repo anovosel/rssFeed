@@ -58,6 +58,7 @@ extension FeedConfigurationEntity {
 
     static func updateFeedConfiguration(
         originalUrlString: String,
+        newName: String,
         newUrlString: String,
         description: String?,
         imageUrlString: String?
@@ -70,6 +71,7 @@ extension FeedConfigurationEntity {
                 .viewContext
                 .fetch(fetchRequest)
                 .forEach {
+                    $0.name = newName
                     $0.urlString = newUrlString
                     $0.feedDescription = description
                     $0.imageUrlString = imageUrlString

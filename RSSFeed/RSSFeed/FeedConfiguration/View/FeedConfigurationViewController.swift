@@ -13,25 +13,26 @@ final class FeedConfigurationViewController: UIViewController {
     var collectionViewDataSource: UICollectionViewDiffableDataSource<Section, FeedConfigurationItem>!
     var snapshot: NSDiffableDataSourceSnapshot<Section, FeedConfigurationItem>!
 
-    let dataItems: [FeedConfigurationItem] = [
-        FeedConfigurationItem(name: "Stream1", urlString: "stream1.example.com", description: nil, imageURLString: nil),
-        FeedConfigurationItem(name: "Stream2", urlString: "stream2.example.com", description: nil, imageURLString: nil),
-        FeedConfigurationItem(name: "Stream3", urlString: "stream3.example.com", description: nil, imageURLString: nil),
-        FeedConfigurationItem(name: "Stream4", urlString: "stream4.example.com", description: nil, imageURLString: nil),
-        FeedConfigurationItem(name: "Stream5", urlString: "stream5.example.com", description: nil, imageURLString: nil),
-        FeedConfigurationItem(name: "Stream6", urlString: "stream6.example.com", description: nil, imageURLString: nil),
-        FeedConfigurationItem(name: "Stream7", urlString: "stream7.example.com", description: nil, imageURLString: nil),
-        FeedConfigurationItem(name: "Stream8", urlString: "stream8.example.com", description: nil, imageURLString: nil),
-        FeedConfigurationItem(name: "Stream9", urlString: "stream9.example.com", description: nil, imageURLString: nil),
-        FeedConfigurationItem(name: "Stream10", urlString: "stream10.example.com", description: nil, imageURLString: nil),
-        FeedConfigurationItem(name: "Stream11", urlString: "stream11.example.com", description: nil, imageURLString: nil),
-        FeedConfigurationItem(name: "Stream12", urlString: "stream12.example.com", description: nil, imageURLString: nil)
+    var dataItems: [FeedConfigurationItem] = [
+//        FeedConfigurationItem(name: "Stream1", urlString: "stream1.example.com", description: nil, imageURLString: nil),
+//        FeedConfigurationItem(name: "Stream2", urlString: "stream2.example.com", description: nil, imageURLString: nil),
+//        FeedConfigurationItem(name: "Stream3", urlString: "stream3.example.com", description: nil, imageURLString: nil),
+//        FeedConfigurationItem(name: "Stream4", urlString: "stream4.example.com", description: nil, imageURLString: nil),
+//        FeedConfigurationItem(name: "Stream5", urlString: "stream5.example.com", description: nil, imageURLString: nil),
+//        FeedConfigurationItem(name: "Stream6", urlString: "stream6.example.com", description: nil, imageURLString: nil),
+//        FeedConfigurationItem(name: "Stream7", urlString: "stream7.example.com", description: nil, imageURLString: nil),
+//        FeedConfigurationItem(name: "Stream8", urlString: "stream8.example.com", description: nil, imageURLString: nil),
+//        FeedConfigurationItem(name: "Stream9", urlString: "stream9.example.com", description: nil, imageURLString: nil),
+//        FeedConfigurationItem(name: "Stream10", urlString: "stream10.example.com", description: nil, imageURLString: nil),
+//        FeedConfigurationItem(name: "Stream11", urlString: "stream11.example.com", description: nil, imageURLString: nil),
+//        FeedConfigurationItem(name: "Stream12", urlString: "stream12.example.com", description: nil, imageURLString: nil)
     ]
 
     let viewModel: FeedConfigurationViewModelType
-    private let appearSubject: PassthroughSubject<Void, Never> = .init()
+    private let reloadSubject: PassthroughSubject<Void, Never> = .init() // TODO: rename to reload
     private let addConfigurationSubject: PassthroughSubject<FeedConfigurationItem, Never> = .init()
-    private let selectionSubject: PassthroughSubject<FeedConfigurationItem, Never> = .init()
+    private let deleteConfigurationSubject: PassthroughSubject<FeedConfigurationItem, Never> = .init()
+    private let updateConfigurationSubject: PassthroughSubject<(old: FeedConfigurationItem, new: FeedConfigurationItem), Never> = .init()
     private var cancellables: [AnyCancellable] = []
 
 
@@ -47,12 +48,13 @@ final class FeedConfigurationViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
+        bind(to: viewModel)
 
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        appearSubject.send(())
+        reloadSubject.send(())
     }
 }
 
@@ -66,7 +68,17 @@ private extension FeedConfigurationViewController {
     }
 
     func render(_ state: FeedConfigurationViewModelState) {
-
+        switch state {
+        case .reload(let configurationItems):
+            dataItems = configurationItems
+            setupSnapshot()
+        case .success:
+            break
+        case .noResults:
+            break
+        case .failure:
+            break
+        }
     }
 
     func bind(to viewModel: FeedConfigurationViewModelType) {
@@ -74,9 +86,10 @@ private extension FeedConfigurationViewController {
         cancellables.removeAll()
 
         let input = FeedConfigurationViewModelInput(
-            appear: appearSubject.eraseToAnyPublisher(),
+            reloadConfigurations: reloadSubject.eraseToAnyPublisher(),
             addConfiguration: addConfigurationSubject.eraseToAnyPublisher(),
-            selection: selectionSubject.eraseToAnyPublisher())
+            deleteConfiguration: deleteConfigurationSubject.eraseToAnyPublisher(),
+            updateConfiguration: updateConfigurationSubject.eraseToAnyPublisher())
 
         let output = viewModel.transform(input: input)
 
@@ -90,24 +103,15 @@ extension FeedConfigurationViewController: UICollectionViewDelegate {
 
     func collectionView(_ collectionView: UICollectionView,
                         didSelectItemAt indexPath: IndexPath) {
-        guard let selectedItem = collectionViewDataSource.itemIdentifier(for: indexPath) else {
+        guard let selectedItem: FeedConfigurationItem = collectionViewDataSource.itemIdentifier(for: indexPath) else {
             collectionView.deselectItem(at: indexPath, animated: true)
             return
         }
 
-        let alert = UIAlertController(
-            title: selectedItem.name,
-            message: "",
-            preferredStyle: .alert)
-
-        let okAction = UIAlertAction(title: "OK", style: .default, handler: {
-            (_) in
-            collectionView.deselectItem(at: indexPath, animated: true)
-        })
-
-        alert.addAction(okAction)
-
-        present(alert, animated: true, completion: nil)
+        let bottomSheetViewController: FeedConfigurationInputBottomSheetViewController = .init(reason: .edit(selectedItem), delegate: self)
+        bottomSheetViewController.modalPresentationStyle = .overCurrentContext
+        collectionView.deselectItem(at: indexPath, animated: true)
+        self.present(bottomSheetViewController, animated: false)
     }
 
     private func setupCollectionView() {
@@ -117,23 +121,15 @@ extension FeedConfigurationViewController: UICollectionViewDelegate {
                 return UISwipeActionsConfiguration(actions: [])
             }
 
-            let action1: UIContextualAction = .init(
+            let editAction: UIContextualAction = .init(
                 style: .normal,
-                title: "Action 1") { [weak self] action, view, completion in
+                title: "Delete") { [weak self] action, view, completion in
                     self?.handleSwipe(for: action, item: item)
                     completion(true)
                 }
-            action1.backgroundColor = .systemBlue
+            editAction.backgroundColor = .systemRed
 
-            let action2: UIContextualAction = .init(
-                style: .normal,
-                title: "Action 2") { [weak self] action, view, completion in
-                    self?.handleSwipe(for: action, item: item)
-                    completion(true)
-                }
-            action2.backgroundColor = .systemOrange
-
-            return UISwipeActionsConfiguration(actions: [action1, action2])
+            return UISwipeActionsConfiguration(actions: [editAction])
         }
 
         let listLayout: UICollectionViewCompositionalLayout = .list(using: layoutConfiguration)
@@ -173,18 +169,7 @@ extension FeedConfigurationViewController: UICollectionViewDelegate {
     }
 
     func handleSwipe(for action: UIContextualAction, item: FeedConfigurationItem) {
-        let alert: UIAlertController = .init(
-            title: action.title,
-            message: item.name,
-            preferredStyle: .alert)
-
-        let okAction: UIAlertAction = .init(
-            title: "OK",
-            style: .default)
-        
-        alert.addAction(okAction)
-        
-        present(alert, animated: true)
+        delete(item: item)
     }
 }
 
@@ -200,8 +185,22 @@ private extension FeedConfigurationViewController {
 
     @objc
     func addTapped() {
-        let bottomSheetViewController: FeedConfigurationInputBottomSheetViewController = .init()
-        bottomSheetViewController.modalPresentationStyle = .overCurrentContext
+        let bottomSheetViewController: FeedConfigurationInputBottomSheetViewController = .init(reason: .new, delegate: self)
+        bottomSheetViewController.modalPresentationStyle = .overFullScreen
         self.present(bottomSheetViewController, animated: false)
+    }
+}
+
+extension FeedConfigurationViewController: FeedConfigurationInputBottomSheetDelegate {
+    func add(item: FeedConfigurationItem) {
+        addConfigurationSubject.send(item)
+    }
+
+    func delete(item: FeedConfigurationItem) {
+        deleteConfigurationSubject.send(item)
+    }
+
+    func update(oldItem: FeedConfigurationItem, newItem: FeedConfigurationItem) {
+        updateConfigurationSubject.send((old: oldItem, new: newItem))
     }
 }
