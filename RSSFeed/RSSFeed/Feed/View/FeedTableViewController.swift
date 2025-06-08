@@ -1,40 +1,88 @@
+import Combine
 import UIKit
 
 import SnapKit
 
 final class FeedTableViewController: UIViewController {
 
-    let tableView: UITableView = .init()
+    typealias DataSource = UITableViewDiffableDataSource<Section, FeedConfigurationItem>
+    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, FeedConfigurationItem>
 
-    var dataItems: [FeedConfigurationItem] = [
-        FeedConfigurationItem(name: "Stream1", urlString: "stream1.example.com", description: "Description, description, description", imageURLString: nil),
-        FeedConfigurationItem(name: "Stream2", urlString: "stream2.example.com", description: "Description, description, description", imageURLString: nil),
-        FeedConfigurationItem(name: "Stream3", urlString: "stream3.example.com", description: "Description, description, description", imageURLString: nil),
-        FeedConfigurationItem(name: "Stream4", urlString: "stream4.example.com", description: "Description, description, description", imageURLString: nil),
-        FeedConfigurationItem(name: "Stream5", urlString: "stream5.example.com", description: "Description, description, description", imageURLString: nil),
-        FeedConfigurationItem(name: "Stream6", urlString: "stream6.example.com", description: "Description, description, description", imageURLString: nil),
-        FeedConfigurationItem(name: "Stream7", urlString: "stream7.example.com", description: "Description, description, description", imageURLString: nil),
-        FeedConfigurationItem(name: "Stream8", urlString: "stream8.example.com", description: "Description, description, description", imageURLString: nil),
-        FeedConfigurationItem(name: "Stream9", urlString: "stream9.example.com", description: "Description, description, description", imageURLString: nil),
-        FeedConfigurationItem(name: "Stream10", urlString: "stream10.example.com", description: "Description, description, description", imageURLString: nil),
-        FeedConfigurationItem(name: "Stream11", urlString: "stream11.example.com", description: "Description, description, description", imageURLString: nil),
-        FeedConfigurationItem(name: "Stream12", urlString: "stream12.example.com", description: "Description, description, description", imageURLString: nil)
-    ]
+    enum Section {
+        case main
+    }
 
+    private let tableView: UITableView = .init()
+
+    private lazy var dataSource: DataSource = makeDataSource()
+
+    private var dataItems: [FeedConfigurationItem] = []
+    private let viewModel: FeedViewModelType
+    private let reloadSubject: PassthroughSubject<Void, Never> = .init()
+    private var cancellables: [AnyCancellable] = []
+
+
+
+    init(viewModel: FeedViewModelType) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
+        bind(to: viewModel)
     }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        reloadSubject.send(())
+    }
+}
+
+extension FeedTableViewController: UITableViewDelegate {
+}
+
+private extension FeedTableViewController {
 
     func setupViews() {
         setupTableView()
         setupConstraints()
     }
 
+    func render(_ state: FeedViewModelState) {
+        switch state {
+        case .reload(let configurationItems):
+            dataItems = configurationItems
+            applySnapshot()
+        }
+    }
+
+    func bind(to viewModel: FeedViewModelType) {
+        cancellables.forEach { $0.cancel() }
+        cancellables.removeAll()
+
+        let input: FeedViewModelInput = .init(reloadFeeds: reloadSubject.eraseToAnyPublisher())
+
+        let output: FeedViewModelOutput = viewModel.transform(input: input)
+
+        output
+            .sink { [unowned self] state in
+                self.render(state)
+            }
+            .store(in: &cancellables)
+    }
+
     func setupTableView() {
         tableView.register(FeedTableViewCell.self, forCellReuseIdentifier: FeedTableViewCell.description())
-        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.dataSource = dataSource
         tableView.separatorStyle = .none
+        applySnapshot()
     }
 
     func setupConstraints() {
@@ -45,18 +93,28 @@ final class FeedTableViewController: UIViewController {
     }
 }
 
-extension FeedTableViewController: UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return dataItems.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell: FeedTableViewCell = tableView.dequeueReusableCell(withIdentifier: FeedTableViewCell.description()) as? FeedTableViewCell else {
-            let cell: FeedTableViewCell = .init(style: .default, reuseIdentifier: FeedTableViewCell.description())
-            cell.configure(with: dataItems[indexPath.row])
+private extension FeedTableViewController {
+
+    func makeDataSource() -> DataSource {
+
+        let dataSource = DataSource(tableView: tableView,
+                                    cellProvider: { (tableView, indexPath, title) -> UITableViewCell? in
+            guard let cell: FeedTableViewCell = tableView.dequeueReusableCell(withIdentifier: FeedTableViewCell.description()) as? FeedTableViewCell else {
+                let cell: FeedTableViewCell = .init(style: .default, reuseIdentifier: FeedTableViewCell.description())
+                cell.configure(with: self.dataItems[indexPath.row])
+                return cell
+            }
+            cell.configure(with: self.dataItems[indexPath.row])
             return cell
-        }
-        cell.configure(with: dataItems[indexPath.row])
-        return cell
+        })
+
+        return dataSource
+    }
+
+    func applySnapshot(animatingDifferences: Bool = true) {
+        var snapshot: Snapshot = .init()
+        snapshot.appendSections([.main])
+        snapshot.appendItems(dataItems)
+        dataSource.apply(snapshot, animatingDifferences: animatingDifferences)
     }
 }

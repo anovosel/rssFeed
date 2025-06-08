@@ -60,12 +60,12 @@ private extension FeedTableViewCell {
         }
 
         feedTitleLabel.snp.makeConstraints {
-            $0.top.trailing.equalToSuperview().inset(16)
+            $0.top.trailing.equalToSuperview().inset(32)
             $0.leading.equalTo(feedImageView.snp.trailing).offset(8)
         }
 
         feedDescriptionLabel.snp.makeConstraints {
-            $0.bottom.trailing.equalToSuperview().inset(16)
+            $0.bottom.trailing.equalToSuperview().inset(32)
             $0.leading.equalTo(feedImageView.snp.trailing).offset(8)
         }
     }

@@ -10,6 +10,7 @@ final class FeedConfigurationUseCase {
 }
 
 extension FeedConfigurationUseCase: FeedConfigurationUseCaseType {
+
     func addConfiguration(_ configuration: FeedConfigurationItem) {
         repository
             .saveConfiguration(

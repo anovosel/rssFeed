@@ -9,13 +9,13 @@ final class FeedConfigurationViewController: UIViewController {
         case main
     }
 
-    var collectionView: UICollectionView!
-    var collectionViewDataSource: UICollectionViewDiffableDataSource<Section, FeedConfigurationItem>!
-    var snapshot: NSDiffableDataSourceSnapshot<Section, FeedConfigurationItem>!
+    private var collectionView: UICollectionView!
+    private var collectionViewDataSource: UICollectionViewDiffableDataSource<Section, FeedConfigurationItem>!
+    private var snapshot: NSDiffableDataSourceSnapshot<Section, FeedConfigurationItem>!
 
-    var dataItems: [FeedConfigurationItem] = []
+    private var dataItems: [FeedConfigurationItem] = []
 
-    let viewModel: FeedConfigurationViewModelType
+    private let viewModel: FeedConfigurationViewModelType
     private let reloadSubject: PassthroughSubject<Void, Never> = .init() // TODO: rename to reload
     private let addConfigurationSubject: PassthroughSubject<FeedConfigurationItem, Never> = .init()
     private let deleteConfigurationSubject: PassthroughSubject<FeedConfigurationItem, Never> = .init()
@@ -51,14 +51,14 @@ private extension FeedConfigurationViewController {
         setupNavigationBar()
         setupCollectionView()
         setupCollectionViewDataSource()
-        setupSnapshot()
+        applySnapshot()
     }
 
     func render(_ state: FeedConfigurationViewModelState) {
         switch state {
         case .reload(let configurationItems):
             dataItems = configurationItems
-            setupSnapshot()
+            applySnapshot()
         case .success:
             break
         case .noResults:
@@ -72,17 +72,19 @@ private extension FeedConfigurationViewController {
         cancellables.forEach { $0.cancel() }
         cancellables.removeAll()
 
-        let input = FeedConfigurationViewModelInput(
+        let input: FeedConfigurationViewModelInput = .init(
             reloadConfigurations: reloadSubject.eraseToAnyPublisher(),
             addConfiguration: addConfigurationSubject.eraseToAnyPublisher(),
             deleteConfiguration: deleteConfigurationSubject.eraseToAnyPublisher(),
             updateConfiguration: updateConfigurationSubject.eraseToAnyPublisher())
 
-        let output = viewModel.transform(input: input)
+        let output: FeedConfigurationViewModelOutput = viewModel.transform(input: input)
 
-        output.sink(receiveValue: { [unowned self] state in
-            self.render(state)
-        }).store(in: &cancellables)
+        output
+            .sink { [unowned self] state in
+                self.render(state)
+            }
+            .store(in: &cancellables)
     }
 }
 
@@ -147,12 +149,12 @@ extension FeedConfigurationViewController: UICollectionViewDelegate {
         }
     }
 
-    private func setupSnapshot() {
+    private func applySnapshot(animatingDifferences: Bool = true) {
         snapshot = .init()
         snapshot.appendSections([.main])
         snapshot.appendItems(dataItems, toSection: .main)
 
-        collectionViewDataSource.apply(snapshot, animatingDifferences: false)
+        collectionViewDataSource.apply(snapshot, animatingDifferences: animatingDifferences)
     }
 
     func handleSwipe(for action: UIContextualAction, item: FeedConfigurationItem) {
