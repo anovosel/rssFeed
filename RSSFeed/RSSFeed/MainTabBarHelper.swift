@@ -20,7 +20,7 @@ enum MainTabBarHelper {
             return [feedConfigurationNavigationConroller]
         }
 
-        let firstViewController = UINavigationController(rootViewController: FeedViewController())
+        let firstViewController = UINavigationController(rootViewController: FeedTableViewController())
         firstViewController.tabBarItem = UITabBarItem(tabBarSystemItem: .featured, tag: 0)
 
         let secondViewController = UINavigationController(rootViewController: FeedConfigurationViewController(viewModel: feedConfigurationViewModel))

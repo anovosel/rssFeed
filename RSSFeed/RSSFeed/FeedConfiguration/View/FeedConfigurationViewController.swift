@@ -13,20 +13,7 @@ final class FeedConfigurationViewController: UIViewController {
     var collectionViewDataSource: UICollectionViewDiffableDataSource<Section, FeedConfigurationItem>!
     var snapshot: NSDiffableDataSourceSnapshot<Section, FeedConfigurationItem>!
 
-    var dataItems: [FeedConfigurationItem] = [
-//        FeedConfigurationItem(name: "Stream1", urlString: "stream1.example.com", description: nil, imageURLString: nil),
-//        FeedConfigurationItem(name: "Stream2", urlString: "stream2.example.com", description: nil, imageURLString: nil),
-//        FeedConfigurationItem(name: "Stream3", urlString: "stream3.example.com", description: nil, imageURLString: nil),
-//        FeedConfigurationItem(name: "Stream4", urlString: "stream4.example.com", description: nil, imageURLString: nil),
-//        FeedConfigurationItem(name: "Stream5", urlString: "stream5.example.com", description: nil, imageURLString: nil),
-//        FeedConfigurationItem(name: "Stream6", urlString: "stream6.example.com", description: nil, imageURLString: nil),
-//        FeedConfigurationItem(name: "Stream7", urlString: "stream7.example.com", description: nil, imageURLString: nil),
-//        FeedConfigurationItem(name: "Stream8", urlString: "stream8.example.com", description: nil, imageURLString: nil),
-//        FeedConfigurationItem(name: "Stream9", urlString: "stream9.example.com", description: nil, imageURLString: nil),
-//        FeedConfigurationItem(name: "Stream10", urlString: "stream10.example.com", description: nil, imageURLString: nil),
-//        FeedConfigurationItem(name: "Stream11", urlString: "stream11.example.com", description: nil, imageURLString: nil),
-//        FeedConfigurationItem(name: "Stream12", urlString: "stream12.example.com", description: nil, imageURLString: nil)
-    ]
+    var dataItems: [FeedConfigurationItem] = []
 
     let viewModel: FeedConfigurationViewModelType
     private let reloadSubject: PassthroughSubject<Void, Never> = .init() // TODO: rename to reload
@@ -47,7 +34,7 @@ final class FeedConfigurationViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        configureUI()
+        setupViews()
         bind(to: viewModel)
 
     }
@@ -60,7 +47,7 @@ final class FeedConfigurationViewController: UIViewController {
 
 private extension FeedConfigurationViewController {
 
-    func configureUI() {
+    func setupViews() {
         setupNavigationBar()
         setupCollectionView()
         setupCollectionViewDataSource()
