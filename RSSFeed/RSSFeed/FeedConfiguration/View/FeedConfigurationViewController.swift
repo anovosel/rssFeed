@@ -135,17 +135,13 @@ extension FeedConfigurationViewController: UICollectionViewDelegate {
     }
 
     private func makeDataSource() -> DataSource {
-        let cellRegistration: UICollectionView.CellRegistration<UICollectionViewListCell, FeedConfigurationItem> = .init { cell, indexPath, item in
-            var content = cell.defaultContentConfiguration()
-    //        content.image
-            content.text = item.name
-
-            cell.contentConfiguration = content
+        let cellRegistration: UICollectionView.CellRegistration<FeedConfigurationCollectionViewCell, FeedConfigurationItem> = .init { cell, indexPath, item in
+            cell.configure(with: item)
         }
 
         return DataSource(collectionView: collectionView) { (collectionView: UICollectionView, indexPath: IndexPath, identifier: FeedConfigurationItem) -> UICollectionViewCell? in
             let cell = collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: identifier)
-            cell.accessories = [.disclosureIndicator()]
+//            cell.accessories = [.disclosureIndicator()]
 
             return cell
         }
