@@ -12,6 +12,13 @@ class FeedDetailsCollectionViewCell: UICollectionViewCell {
         return imageView
     }()
 
+    private let verticalStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 8
+        return stackView
+    }()
+
     private let feedTitleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 17, weight: .medium)
@@ -54,7 +61,8 @@ extension FeedDetailsCollectionViewCell {
 private extension FeedDetailsCollectionViewCell {
 
     func addSubviews() {
-        [feedImageView, feedTitleLabel, feedDescriptionLabel].forEach(addSubview)
+        [feedImageView, verticalStackView].forEach(addSubview)
+        [feedTitleLabel, feedDescriptionLabel].forEach(verticalStackView.addArrangedSubview)
     }
 
     func setupConstraints() {
@@ -64,15 +72,10 @@ private extension FeedDetailsCollectionViewCell {
             $0.size.equalTo(80)
         }
 
-        feedTitleLabel.snp.makeConstraints {
-            $0.top.trailing.equalToSuperview().inset(8)
+        verticalStackView.snp.makeConstraints {
+            $0.top.bottom.equalToSuperview().inset(8)
             $0.leading.equalTo(feedImageView.snp.trailing).offset(16)
-        }
-
-        feedDescriptionLabel.snp.makeConstraints {
-            $0.top.equalTo(feedTitleLabel.snp.bottom).offset(8)
-            $0.leading.equalTo(feedImageView.snp.trailing).offset(16)
-            $0.bottom.trailing.equalToSuperview().inset(8)
+            $0.trailing.equalToSuperview().inset(16)
         }
 
         feedTitleLabel.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
