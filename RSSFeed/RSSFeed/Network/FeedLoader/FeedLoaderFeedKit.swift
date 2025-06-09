@@ -68,7 +68,7 @@ private extension RSSFeedItem {
 
     func asFeedApiModel() -> FeedItemApiModel {
         return FeedItemApiModel(
-            imageUrlString: nil,
+            imageUrlString: media?.mediaThumbnails?.first?.attributes?.url,
             title: title,
             description: description,
             link: link

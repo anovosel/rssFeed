@@ -15,7 +15,7 @@ class FeedConfigurationCollectionViewCell: UICollectionViewCell {
     private let feedTitleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 17, weight: .medium)
-        label.textColor = .systemGray2
+        label.textColor = .systemGray
         label.numberOfLines = 0
         return label
     }()
@@ -23,14 +23,14 @@ class FeedConfigurationCollectionViewCell: UICollectionViewCell {
     private let feedDescriptionLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 14, weight: .regular)
-        label.textColor = .systemGray3
+        label.textColor = .systemGray2
         label.numberOfLines = 0
         return label
     }()
 
     override init(frame: CGRect) {
         super.init(frame: .zero)
-        backgroundColor = .systemFill
+        backgroundColor = .systemGray6
         addSubviews()
         setupConstraints()
     }

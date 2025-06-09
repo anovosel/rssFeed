@@ -82,7 +82,7 @@ extension FeedDetailsViewController: UICollectionViewDelegate {
     }
 
     private func makeCollectionView() -> UICollectionView {
-        var layoutConfiguration: UICollectionLayoutListConfiguration = .init(appearance: .insetGrouped)
+        let layoutConfiguration: UICollectionLayoutListConfiguration = .init(appearance: .plain)
         let listLayout = UICollectionViewCompositionalLayout.list(using: layoutConfiguration)
 
         let collectionView = UICollectionView(
@@ -99,11 +99,8 @@ extension FeedDetailsViewController: UICollectionViewDelegate {
     }
 
     private func makeDataSource() -> DataSource {
-        let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, FeedDetailsItem> { cell, indexPath, item in
-            var content = cell.defaultContentConfiguration()
-            content.text = item.title
-
-            cell.contentConfiguration = content
+        let cellRegistration = UICollectionView.CellRegistration<FeedDetailsCollectionViewCell, FeedDetailsItem> { cell, indexPath, item in
+            cell.configure(with: item)
         }
 
         return DataSource(collectionView: collectionView) { (collectionView: UICollectionView, indexPath: IndexPath, identifier: FeedDetailsItem) -> UICollectionViewCell? in
