@@ -2,5 +2,5 @@ import Foundation
 
 protocol FeedLoader {
 
-    func loadFeed(formUrl urlString: String) async // TODO: define APILayerModel
+    func loadFeed(formUrl urlString: String) async -> [FeedApiModel]
 }

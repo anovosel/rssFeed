@@ -5,23 +5,24 @@ import SnapKit
 
 final class FeedConfigurationViewController: UIViewController {
 
+    typealias DataSource = UICollectionViewDiffableDataSource<Section, FeedConfigurationItem>
+    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, FeedConfigurationItem>
+
     enum Section {
         case main
     }
 
-    private var collectionView: UICollectionView!
-    private var collectionViewDataSource: UICollectionViewDiffableDataSource<Section, FeedConfigurationItem>!
-    private var snapshot: NSDiffableDataSourceSnapshot<Section, FeedConfigurationItem>!
+    lazy private var collectionView: UICollectionView = makeCollectionView()
+    lazy private var collectionViewDataSource: DataSource = makeDataSource()
 
     private var dataItems: [FeedConfigurationItem] = []
 
     private let viewModel: FeedConfigurationViewModelType
-    private let reloadSubject: PassthroughSubject<Void, Never> = .init() // TODO: rename to reload
+    private let reloadSubject: PassthroughSubject<Void, Never> = .init()
     private let addConfigurationSubject: PassthroughSubject<FeedConfigurationItem, Never> = .init()
     private let deleteConfigurationSubject: PassthroughSubject<FeedConfigurationItem, Never> = .init()
     private let updateConfigurationSubject: PassthroughSubject<(old: FeedConfigurationItem, new: FeedConfigurationItem), Never> = .init()
     private var cancellables: [AnyCancellable] = []
-
 
     init(viewModel: FeedConfigurationViewModelType) {
         self.viewModel = viewModel
@@ -36,7 +37,6 @@ final class FeedConfigurationViewController: UIViewController {
         super.viewDidLoad()
         setupViews()
         bind(to: viewModel)
-
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -49,8 +49,6 @@ private extension FeedConfigurationViewController {
 
     func setupViews() {
         setupNavigationBar()
-        setupCollectionView()
-        setupCollectionViewDataSource()
         applySnapshot()
     }
 
@@ -103,7 +101,7 @@ extension FeedConfigurationViewController: UICollectionViewDelegate {
         self.present(bottomSheetViewController, animated: false)
     }
 
-    private func setupCollectionView() {
+    private func makeCollectionView() -> UICollectionView {
         var layoutConfiguration: UICollectionLayoutListConfiguration = .init(appearance: .insetGrouped)
         layoutConfiguration.trailingSwipeActionsConfigurationProvider = { [unowned self] (indexPath) in
             guard let item = collectionViewDataSource.itemIdentifier(for: indexPath) else {
@@ -123,25 +121,29 @@ extension FeedConfigurationViewController: UICollectionViewDelegate {
 
         let listLayout: UICollectionViewCompositionalLayout = .list(using: layoutConfiguration)
 
-        collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: listLayout)
+        let collectionView: UICollectionView = .init(
+            frame: view.bounds,
+            collectionViewLayout: listLayout)
         view.addSubview(collectionView)
         collectionView.delegate = self
 
         collectionView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
+
+        return collectionView
     }
 
-    private func setupCollectionViewDataSource() {
-        let cellRegistration: UICollectionView.CellRegistration<UICollectionViewListCell, FeedConfigurationItem> = .init { cell, indexPath, itemIdentifier in
+    private func makeDataSource() -> DataSource {
+        let cellRegistration: UICollectionView.CellRegistration<UICollectionViewListCell, FeedConfigurationItem> = .init { cell, indexPath, item in
             var content = cell.defaultContentConfiguration()
     //        content.image
-            content.text = itemIdentifier.name
+            content.text = item.name
 
             cell.contentConfiguration = content
         }
 
-        collectionViewDataSource = UICollectionViewDiffableDataSource<Section, FeedConfigurationItem>(collectionView: collectionView) { (collectionView: UICollectionView, indexPath: IndexPath, identifier: FeedConfigurationItem) -> UICollectionViewCell? in
+        return DataSource(collectionView: collectionView) { (collectionView: UICollectionView, indexPath: IndexPath, identifier: FeedConfigurationItem) -> UICollectionViewCell? in
             let cell = collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: identifier)
             cell.accessories = [.disclosureIndicator()]
 
@@ -150,7 +152,7 @@ extension FeedConfigurationViewController: UICollectionViewDelegate {
     }
 
     private func applySnapshot(animatingDifferences: Bool = true) {
-        snapshot = .init()
+        var snapshot: Snapshot = .init()
         snapshot.appendSections([.main])
         snapshot.appendItems(dataItems, toSection: .main)
 

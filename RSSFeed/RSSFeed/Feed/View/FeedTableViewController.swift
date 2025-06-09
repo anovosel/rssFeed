@@ -45,6 +45,19 @@ final class FeedTableViewController: UIViewController {
 }
 
 extension FeedTableViewController: UITableViewDelegate {
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let item: FeedConfigurationItem = dataItems[indexPath.row]
+        tableView.deselectRow(at: indexPath, animated: true)
+        let feedLoader: FeedLoader = FeedLoaderFeedKit()
+        let feedDetailsUseCase: FeedDetailsUseCaseType = FeedDetailsUseCase(feedLoader: feedLoader)
+        let feedDetailsViewModel: FeedDetailsViewModelType = FeedDetailsViewModel(useCase: feedDetailsUseCase)
+        let feedDetailsViewController: FeedDetailsViewController = .init(
+            viewModel: feedDetailsViewModel,
+            feedConfigurationItem: item)
+
+        self.navigationController?.pushViewController(feedDetailsViewController, animated: true)
+    }
 }
 
 private extension FeedTableViewController {

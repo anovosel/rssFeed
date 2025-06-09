@@ -1,3 +1,5 @@
+import Foundation
+
 protocol FeedConfigurationUseCaseType {
 
     func addConfiguration(_ configuration: FeedConfigurationItem)
