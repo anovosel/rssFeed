@@ -1,11 +1,12 @@
 final class FeedConfigurationUseCase {
 
     private let repository: FeedConfigurationRepository
-    private let feedLoder: FeedLoader
+    private let feedLoader: FeedLoader
 
-    init(repository: FeedConfigurationRepository, feedLoder: FeedLoader) {
+    init(repository: FeedConfigurationRepository,
+         feedLoader: FeedLoader) {
         self.repository = repository
-        self.feedLoder = feedLoder
+        self.feedLoader = feedLoader
     }
 }
 
@@ -17,17 +18,18 @@ extension FeedConfigurationUseCase: FeedConfigurationUseCaseType {
                 .init(
                     name: configuration.name,
                     urlString: configuration.urlString,
-                    imageUrlString: configuration.imageURLString,
                     description: configuration.description))
     }
     
-    func loadConfigurations() -> [FeedConfigurationItem] {
-        repository
+    func loadConfigurations() async -> [FeedConfigurationItem] {
+        await repository
             .getConfigurations()
-            .map { .init(name: $0.name,
+            .asyncMap {
+                let imageUrlString: String? = await feedLoader.loadFeed(fromUrl: $0.urlString)?.imageUrlString
+                return .init(name: $0.name,
                          urlString: $0.urlString,
                          description: $0.description,
-                         imageURLString: $0.imageUrlString) }
+                         imageURLString: imageUrlString) }
     }
     
     func deleteConfiguration(_ configuration: FeedConfigurationItem) {
@@ -36,7 +38,6 @@ extension FeedConfigurationUseCase: FeedConfigurationUseCaseType {
                 .init(
                     name: configuration.name,
                     urlString: configuration.urlString,
-                    imageUrlString: configuration.imageURLString,
                     description: configuration.description))
     }
     
@@ -47,9 +48,6 @@ extension FeedConfigurationUseCase: FeedConfigurationUseCaseType {
                 withConfiguration: .init(
                     name: new.name,
                     urlString: new.urlString,
-                    imageUrlString: new.imageURLString,
                     description: new.description))
     }
-    
-
 }

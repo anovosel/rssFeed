@@ -14,7 +14,7 @@ extension FeedDetailsUseCase: FeedDetailsUseCaseType {
     func loadDetails(_ configuration: FeedConfigurationItem) async -> [FeedDetailsItem] {
 
         await feedLoader
-            .loadFeed(formUrl: configuration.urlString)
+            .loadFeedItems(formUrl: configuration.urlString)
             .map {
                 FeedDetailsItem(
                     title: $0.title,

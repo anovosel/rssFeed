@@ -2,7 +2,39 @@ import FeedKit
 
 final class FeedLoaderFeedKit: FeedLoader {
 
-    func loadFeed(formUrl urlString: String) async -> [FeedApiModel] {
+    func loadFeed(fromUrl urlString: String) async -> FeedApiModel? {
+        guard let feedURL = URL(string: urlString) else {
+            return nil
+        }
+
+        let parser = FeedParser(URL: feedURL)
+
+        return await withCheckedContinuation { continuation in
+            parser.parseAsync { result in
+                switch result {
+                case .success(let feed):
+                    switch feed {
+                    case .rss(let rssFeed):
+                        if let imageUrl: String = rssFeed.image?.url {
+                            continuation.resume(returning: .init(imageUrlString: imageUrl))
+                        }
+                    case .atom(let atomFeed):
+                        if let imageUrl: String = atomFeed.icon {
+                            continuation.resume(returning: .init(imageUrlString: imageUrl))
+                        }
+                    case .json(let jsonFeed):
+                        if let imageUrl: String = jsonFeed.icon {
+                            continuation.resume(returning: .init(imageUrlString: imageUrl))
+                        }
+                    }
+                case .failure(let error):
+                    continuation.resume(returning: nil)
+                }
+            }
+        }
+    }
+
+    func loadFeedItems(formUrl urlString: String) async -> [FeedItemApiModel] {
         guard let feedURL = URL(string: urlString) else {
             return []
         }
@@ -13,19 +45,18 @@ final class FeedLoaderFeedKit: FeedLoader {
             parser.parseAsync { result in
                 switch result {
                 case .success(let feed):
-                    print("Feed Parsed: \(feed)")
                     switch feed {
                     case .rss(let rssFeed):
-                        let items: [FeedApiModel] = rssFeed.items?.map { $0.asFeedApiModel() } ?? []
+                        let items: [FeedItemApiModel] = rssFeed.items?.map { $0.asFeedApiModel() } ?? []
                         continuation.resume(returning: items)
                     case .atom(let atomFeed):
-                        let items: [FeedApiModel] = atomFeed.links?.compactMap { $0.attributes?.asFeedApiModel() } ?? []
+                        let items: [FeedItemApiModel] = atomFeed.links?.compactMap { $0.attributes?.asFeedApiModel() } ?? []
                         continuation.resume(returning: items)
                     case .json(let jsonFeed):
-                        let items: [FeedApiModel] = jsonFeed.items?.map { $0.asFeedApiModel() } ?? []
+                        let items: [FeedItemApiModel] = jsonFeed.items?.map { $0.asFeedApiModel() } ?? []
                         continuation.resume(returning: items)
                     }
-                case .failure(let error):
+                case .failure:
                     continuation.resume(returning: [])
                 }
             }
@@ -35,8 +66,8 @@ final class FeedLoaderFeedKit: FeedLoader {
 
 private extension RSSFeedItem {
 
-    func asFeedApiModel() -> FeedApiModel {
-        return FeedApiModel(
+    func asFeedApiModel() -> FeedItemApiModel {
+        return FeedItemApiModel(
             imageUrlString: nil,
             title: title,
             description: description,
@@ -47,8 +78,8 @@ private extension RSSFeedItem {
 
 private extension AtomFeedLink.Attributes {
 
-    func asFeedApiModel() -> FeedApiModel {
-        return FeedApiModel(
+    func asFeedApiModel() -> FeedItemApiModel {
+        return FeedItemApiModel(
             imageUrlString: nil,
             title: title,
             description: nil,
@@ -59,8 +90,8 @@ private extension AtomFeedLink.Attributes {
 
 private extension JSONFeedItem {
 
-    func asFeedApiModel() -> FeedApiModel {
-        return FeedApiModel(
+    func asFeedApiModel() -> FeedItemApiModel {
+        return FeedItemApiModel(
             imageUrlString: image,
             title: title,
             description: summary,

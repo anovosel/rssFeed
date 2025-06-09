@@ -14,7 +14,6 @@ final class FeedConfigurationLocalRepository: FeedConfigurationRepository {
         FeedConfigurationEntity
             .addFeedConfiguration(
                 description: configuration.description,
-                imageUrlString: configuration.imageUrlString,
                 name: configuration.name,
                 urlString: configuration.urlString)
     }
@@ -25,8 +24,7 @@ final class FeedConfigurationLocalRepository: FeedConfigurationRepository {
                 originalUrlString: originalUrlString,
                 newName: newConfiguration.name,
                 newUrlString: newConfiguration.urlString,
-                description: newConfiguration.description,
-                imageUrlString: newConfiguration.imageUrlString)
+                description: newConfiguration.description)
     }
 
     func deleteConfiguration(_ configuration: FeedConfigurationDTO) {
@@ -47,7 +45,6 @@ private extension FeedConfigurationEntity {
         return .init(
             name: name,
             urlString: urlString,
-            imageUrlString: imageUrlString,
             description: feedDescription)
     }
 }

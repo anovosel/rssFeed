@@ -1,4 +1,4 @@
 protocol FeedUseCaseType {
 
-    func loadFeeds() -> [FeedConfigurationItem]
+    func loadFeeds() async -> [FeedConfigurationItem]
 }

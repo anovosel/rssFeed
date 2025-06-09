@@ -23,7 +23,6 @@ extension FeedConfigurationEntity {
 
     static func addFeedConfiguration(
         description: String?,
-        imageUrlString: String?,
         name: String,
         urlString: String
     ) {
@@ -31,7 +30,6 @@ extension FeedConfigurationEntity {
         let newFeedConfiguration: FeedConfigurationEntity = .init(context: CoreDataManager.shared.viewContext)
 
         newFeedConfiguration.feedDescription = description
-        newFeedConfiguration.imageUrlString = imageUrlString
         newFeedConfiguration.name = name
         newFeedConfiguration.urlString = urlString
         
@@ -61,7 +59,6 @@ extension FeedConfigurationEntity {
         newName: String,
         newUrlString: String,
         description: String?,
-        imageUrlString: String?
     ) {
         let urlStringPredicate: NSPredicate = .init(format: "urlString == %@", originalUrlString)
         let fetchRequest: NSFetchRequest<FeedConfigurationEntity> = FeedConfigurationEntity.createFetchRequest(withPredicate: urlStringPredicate)
@@ -74,7 +71,6 @@ extension FeedConfigurationEntity {
                     $0.name = newName
                     $0.urlString = newUrlString
                     $0.feedDescription = description
-                    $0.imageUrlString = imageUrlString
                 }
             CoreDataManager.shared.saveContext()
         } catch {

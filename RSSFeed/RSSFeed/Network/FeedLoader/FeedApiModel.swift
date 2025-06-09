@@ -1,7 +1,5 @@
-struct FeedApiModel {
-    let imageUrlString: String?
-    let title: String?
-    let description: String?
-    let link: String?
-}
+import Foundation
 
+struct FeedApiModel {
+    let imageUrlString: String
+}

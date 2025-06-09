@@ -41,6 +41,9 @@ extension FeedViewModel: FeedViewModelType {
 private extension FeedViewModel {
 
     func reloadFeeds() {
-        reloadFeedsSubject.send(useCase.loadFeeds())
+        Task { @MainActor in
+            let loadedFeeds: [FeedConfigurationItem] = await useCase.loadFeeds()
+            reloadFeedsSubject.send(loadedFeeds)
+        }
     }
 }

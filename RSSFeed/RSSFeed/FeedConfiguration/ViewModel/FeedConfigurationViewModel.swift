@@ -74,6 +74,8 @@ extension FeedConfigurationViewModel: FeedConfigurationViewModelType {
 private extension FeedConfigurationViewModel {
 
     func reloadConfigurations() {
-        reloadConfigurationSubject.send(useCase.loadConfigurations())
+        Task { @MainActor in
+            await reloadConfigurationSubject.send(useCase.loadConfigurations())
+        }
     }
 }

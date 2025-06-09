@@ -1,12 +1,13 @@
 import UIKit
 
+import SDWebImage
 import SnapKit
 
 class FeedTableViewCell: UITableViewCell {
 
     private let feedImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
+        imageView.contentMode = .scaleAspectFit
         imageView.clipsToBounds = true
         return imageView
     }()
@@ -41,7 +42,9 @@ class FeedTableViewCell: UITableViewCell {
 extension FeedTableViewCell {
 
     func configure(with item: FeedConfigurationItem) {
-        feedImageView.image = .checkmark
+        if let imageUrlString: String = item.imageURLString {
+            feedImageView.sd_setImage(with: URL(string: imageUrlString))
+        }
         feedTitleLabel.text = item.name
         feedDescriptionLabel.text = item.description
     }

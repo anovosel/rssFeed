@@ -7,10 +7,11 @@ enum MainTabBarHelper {
     static func getViewController() -> [UIViewController] {
 
         let feedConfigurationRepository: FeedConfigurationRepository = FeedConfigurationLocalRepository()
+        let feedLoader: FeedLoader = FeedLoaderFeedKit()
         let feedConfigurationViewModel: FeedConfigurationViewModel = .init(
             useCase: FeedConfigurationUseCase(
                 repository: feedConfigurationRepository,
-                feedLoder: FeedLoaderFeedKit()))
+                feedLoader: feedLoader))
         let feedConfigurationNavigationConroller: UINavigationController = .init(
             rootViewController: FeedConfigurationViewController(
                 viewModel: feedConfigurationViewModel))
@@ -23,7 +24,8 @@ enum MainTabBarHelper {
 
         let feedViewModel: FeedViewModel = .init(
             useCase: FeedUseCase(
-                repository: feedConfigurationRepository))
+                repository: feedConfigurationRepository,
+                feedLoader: feedLoader))
         let firstViewController: UINavigationController = .init(
             rootViewController: FeedTableViewController(
                 viewModel: feedViewModel))
