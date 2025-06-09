@@ -257,7 +257,6 @@ final class FeedConfigurationInputBottomSheetViewController: UIViewController {
     @objc
     func didTapSaveButton() {
         guard let currentItem: FeedConfigurationItem else {
-            // TODO: alert ->
             animateDismissView()
             return
         }

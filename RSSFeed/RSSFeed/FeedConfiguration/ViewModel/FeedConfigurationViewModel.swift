@@ -65,9 +65,7 @@ extension FeedConfigurationViewModel: FeedConfigurationViewModelType {
         let idle: FeedConfigurationViewModelOutput = Publishers.Merge(reloadConfigurationsState, noResultsState)
             .eraseToAnyPublisher()
 
-        return Publishers.Merge(idle, successState)
-//            .removeDuplicates()
-            .eraseToAnyPublisher()
+        return idle
     }
 }
 

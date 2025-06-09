@@ -17,23 +17,15 @@ enum MainTabBarHelper {
                 viewModel: feedConfigurationViewModel))
         feedConfigurationNavigationConroller.tabBarItem = UITabBarItem(tabBarSystemItem: .more, tag: 1)
 
-        // TODO: don't instantiate here and don't hide first -> show empty instead
-        if FeedConfigurationLocalRepository().getConfigurations().isEmpty {
-            return [feedConfigurationNavigationConroller]
-        }
-
         let feedViewModel: FeedViewModel = .init(
             useCase: FeedUseCase(
                 repository: feedConfigurationRepository,
                 feedLoader: feedLoader))
-        let firstViewController: UINavigationController = .init(
+        let feedNavigationController: UINavigationController = .init(
             rootViewController: FeedTableViewController(
                 viewModel: feedViewModel))
-        firstViewController.tabBarItem = UITabBarItem(tabBarSystemItem: .featured, tag: 0)
+        feedNavigationController.tabBarItem = UITabBarItem(tabBarSystemItem: .bookmarks, tag: 0)
 
-        let secondViewController = UINavigationController(rootViewController: FeedConfigurationViewController(viewModel: feedConfigurationViewModel))
-        secondViewController.tabBarItem = UITabBarItem(tabBarSystemItem: .more, tag: 1)
-
-        return [firstViewController, feedConfigurationNavigationConroller]
+        return [feedNavigationController, feedConfigurationNavigationConroller]
     }
 }

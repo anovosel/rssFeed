@@ -26,7 +26,6 @@ extension FeedConfigurationEntity {
         name: String,
         urlString: String
     ) {
-        // TODO: check if configuration with urlString already exists
         let newFeedConfiguration: FeedConfigurationEntity = .init(context: CoreDataManager.shared.viewContext)
 
         newFeedConfiguration.feedDescription = description
