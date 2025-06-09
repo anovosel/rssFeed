@@ -79,6 +79,12 @@ extension FeedDetailsViewController: UICollectionViewDelegate {
 
     func collectionView(_ collectionView: UICollectionView,
                         didSelectItemAt indexPath: IndexPath) {
+        let item: FeedDetailsItem = dataItems[indexPath.item]
+        guard let urlString = item.link,
+              let url: URL = .init(string: urlString) else {
+            return
+        }
+        UIApplication.shared.open(url)
     }
 
     private func makeCollectionView() -> UICollectionView {
