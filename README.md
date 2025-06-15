@@ -25,5 +25,5 @@ https://github.com/user-attachments/assets/39aa68a7-7811-4647-b01f-9da92317fe2b
 - ~~validate input before saving~~ -> implemented [here](https://github.com/anovosel/rssFeed/pull/1)
 - ~~there is a difference when oppening Bottom sheet for editing existing and for adding new feed~~ -> fixed [here](https://github.com/anovosel/rssFeed/pull/2)
 - using loaders, and feedback messages for better UX
-- error handling
+- ~~error handling~~ -> implemented [here](https://github.com/anovosel/rssFeed/pull/1)
 - using Coordinators for navigation between view controllers
