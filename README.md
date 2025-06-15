@@ -22,7 +22,7 @@ https://github.com/user-attachments/assets/39aa68a7-7811-4647-b01f-9da92317fe2b
 ## Future Improvements
 - input validation
 - connect input fields using Combine for validation
-- validate input before saving
+- ~~validate input before saving~~ -> implemented [here](https://github.com/anovosel/rssFeed/pull/1)
 - there is a difference when oppening Bottom sheet for editing existing and for adding new feed
 - using loaders, and feedback messages for better UX
 - error handling
