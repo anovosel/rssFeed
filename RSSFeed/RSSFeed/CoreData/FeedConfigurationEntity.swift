@@ -94,7 +94,7 @@ extension FeedConfigurationEntity {
             .viewContext
             .fetch(
                 createFetchRequest(
-                    withPredicate: predicate(name: urlString)))
+                    withPredicate: predicate(urlString: urlString)))
             .first
     }
 }
