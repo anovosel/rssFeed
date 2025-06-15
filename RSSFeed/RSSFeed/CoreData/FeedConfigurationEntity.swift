@@ -36,8 +36,7 @@ extension FeedConfigurationEntity {
     }
 
     static func deleteFeedConfiguration(withUrlString urlString: String) {
-        let urlStringPredicate: NSPredicate = .init(format: "urlString == %@", urlString)
-        let fetchRequest: NSFetchRequest<FeedConfigurationEntity> = createFetchRequest(withPredicate: urlStringPredicate)
+        let fetchRequest: NSFetchRequest<FeedConfigurationEntity> = createFetchRequest(withPredicate: predicate(urlString: urlString))
 
         do {
             try CoreDataManager
@@ -59,8 +58,8 @@ extension FeedConfigurationEntity {
         newUrlString: String,
         description: String?,
     ) {
-        let urlStringPredicate: NSPredicate = .init(format: "urlString == %@", originalUrlString)
-        let fetchRequest: NSFetchRequest<FeedConfigurationEntity> = FeedConfigurationEntity.createFetchRequest(withPredicate: urlStringPredicate)
+        let fetchRequest: NSFetchRequest<FeedConfigurationEntity> = FeedConfigurationEntity
+            .createFetchRequest(withPredicate: predicate(urlString: originalUrlString))
         do {
             try CoreDataManager
                 .shared

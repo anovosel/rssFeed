@@ -17,7 +17,9 @@ final class FeedConfigurationLocalRepository: FeedConfigurationRepository {
     }
 
     func getConfiguration(withUrlString urlString: String) -> FeedConfigurationDTO? {
-        nil
+        FeedConfigurationEntity
+            .getFeedConfiguration(withUrlString: urlString)?
+            .toDTO
     }
 
     func saveConfiguration(_ configuration: FeedConfigurationDTO) {
