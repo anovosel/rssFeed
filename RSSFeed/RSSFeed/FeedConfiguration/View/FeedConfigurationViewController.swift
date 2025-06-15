@@ -99,7 +99,7 @@ extension FeedConfigurationViewController: UICollectionViewDelegate {
             reason: .edit(selectedItem),
             delegate: self,
             useCase: FeedConfigurationUseCase(repository: FeedConfigurationLocalRepository(), feedLoader: FeedLoaderFeedKit()))
-        bottomSheetViewController.modalPresentationStyle = .overCurrentContext
+        bottomSheetViewController.modalPresentationStyle = .overFullScreen
         collectionView.deselectItem(at: indexPath, animated: true)
         self.present(bottomSheetViewController, animated: false)
     }
