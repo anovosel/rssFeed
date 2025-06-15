@@ -36,8 +36,7 @@ extension FeedConfigurationEntity {
     }
 
     static func deleteFeedConfiguration(withUrlString urlString: String) {
-        let urlStringPredicate: NSPredicate = .init(format: "urlString == %@", urlString)
-        let fetchRequest: NSFetchRequest<FeedConfigurationEntity> = createFetchRequest(withPredicate: urlStringPredicate)
+        let fetchRequest: NSFetchRequest<FeedConfigurationEntity> = createFetchRequest(withPredicate: predicate(urlString: urlString))
 
         do {
             try CoreDataManager
@@ -59,8 +58,8 @@ extension FeedConfigurationEntity {
         newUrlString: String,
         description: String?,
     ) {
-        let urlStringPredicate: NSPredicate = .init(format: "urlString == %@", originalUrlString)
-        let fetchRequest: NSFetchRequest<FeedConfigurationEntity> = FeedConfigurationEntity.createFetchRequest(withPredicate: urlStringPredicate)
+        let fetchRequest: NSFetchRequest<FeedConfigurationEntity> = FeedConfigurationEntity
+            .createFetchRequest(withPredicate: predicate(urlString: originalUrlString))
         do {
             try CoreDataManager
                 .shared
@@ -75,5 +74,38 @@ extension FeedConfigurationEntity {
         } catch {
             debugPrint(error.localizedDescription)
         }
+    }
+
+    static func getFeedConfiguration(withName name: String) -> FeedConfigurationEntity? {
+
+        try? CoreDataManager
+            .shared
+            .viewContext
+            .fetch(
+                createFetchRequest(
+                    withPredicate: predicate(name: name)))
+            .first
+    }
+
+    static func getFeedConfiguration(withUrlString urlString: String) -> FeedConfigurationEntity? {
+
+        try? CoreDataManager
+            .shared
+            .viewContext
+            .fetch(
+                createFetchRequest(
+                    withPredicate: predicate(urlString: urlString)))
+            .first
+    }
+}
+
+private extension FeedConfigurationEntity {
+
+    static func predicate(name: String) -> NSPredicate {
+        .init(format: "name == %@", name)
+    }
+
+    static func predicate(urlString: String) -> NSPredicate {
+        .init(format: "urlString == %@", urlString)
     }
 }
