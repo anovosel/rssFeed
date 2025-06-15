@@ -23,6 +23,8 @@ final class FeedConfigurationInputBottomSheetViewController: UIViewController {
     var containerViewBottomConstraint: Constraint?
     var reason: Reason
     weak var delegate: FeedConfigurationInputBottomSheetDelegate?
+    var useCase: FeedConfigurationUseCaseType
+    var spinnerViewController: SpinnerViewController?
 
     lazy var containerView: UIView = {
         let view = UIView()
@@ -107,9 +109,12 @@ final class FeedConfigurationInputBottomSheetViewController: UIViewController {
             imageURLString: nil)
     }
 
-    init(reason: Reason, delegate: FeedConfigurationInputBottomSheetDelegate) {
+    init(reason: Reason,
+         delegate: FeedConfigurationInputBottomSheetDelegate,
+         useCase: FeedConfigurationUseCaseType) {
         self.reason = reason
         self.delegate = delegate
+        self.useCase = useCase
         super.init(nibName: nil, bundle: nil)
         if case let .edit(item) = reason {
             self.nameInputTextField.text = item.name
@@ -256,22 +261,60 @@ final class FeedConfigurationInputBottomSheetViewController: UIViewController {
 
     @objc
     func didTapSaveButton() {
+        spinnerViewController = showSpinner()
         guard let currentItem: FeedConfigurationItem else {
-            animateDismissView()
+            hideSpinner(spinnerViewController)
+            // show Error message
             return
         }
 
-        switch reason {
-        case .new:
-            delegate?.add(item: currentItem)
-        case .edit(let feedConfigurationItem):
-            delegate?.update(oldItem: feedConfigurationItem, newItem: currentItem)
+        Task { @MainActor in
+            let validationResult = if case let .edit(_) = reason {
+                await useCase.validateExisting(currentItem)
+            } else {
+                await useCase.validateNew(currentItem)
+            }
+
+            switch validationResult {
+            case .success:
+                saveConfiguration(currentItem)
+                animateDismissView()
+            case .failure(reason: let reason):
+                show(validationErrorReason: reason)
+            }
         }
-        animateDismissView()
     }
 }
 
 private extension FeedConfigurationInputBottomSheetViewController {
+
+    func show(validationErrorReason: FeedConfigurationValidationFailureReason) {
+        let message: String =
+            switch validationErrorReason {
+            case .name(let message):
+                message
+            case .urlString(let message):
+                message
+            }
+        let alertController: UIAlertController = .init(title: "Sorry :(", message: message, preferredStyle: .alert)
+        alertController.addAction(.init(title: "OK", style: .default, handler: { [weak self] _ in
+            guard let self else {
+                return
+            }
+
+            hideSpinner(spinnerViewController)
+        }))
+        present(alertController, animated: true)
+    }
+
+    func saveConfiguration(_ configuration: FeedConfigurationItem) {
+        switch reason {
+        case .new:
+            delegate?.add(item: configuration)
+        case .edit(let feedConfigurationItem):
+            delegate?.update(oldItem: feedConfigurationItem, newItem: configuration)
+        }
+    }
 
     static func makeHeaderLable(with text: String) -> UILabel {
         let label: UILabel = .init()

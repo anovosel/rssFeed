@@ -76,4 +76,37 @@ extension FeedConfigurationEntity {
             debugPrint(error.localizedDescription)
         }
     }
+
+    static func getFeedConfiguration(withName name: String) -> FeedConfigurationEntity? {
+
+        try? CoreDataManager
+            .shared
+            .viewContext
+            .fetch(
+                createFetchRequest(
+                    withPredicate: predicate(name: name)))
+            .first
+    }
+
+    static func getFeedConfiguration(withUrlString urlString: String) -> FeedConfigurationEntity? {
+
+        try? CoreDataManager
+            .shared
+            .viewContext
+            .fetch(
+                createFetchRequest(
+                    withPredicate: predicate(name: urlString)))
+            .first
+    }
+}
+
+private extension FeedConfigurationEntity {
+
+    static func predicate(name: String) -> NSPredicate {
+        .init(format: "name == %@", name)
+    }
+
+    static func predicate(urlString: String) -> NSPredicate {
+        .init(format: "urlString == %@", urlString)
+    }
 }

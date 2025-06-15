@@ -10,6 +10,16 @@ final class FeedConfigurationLocalRepository: FeedConfigurationRepository {
             .compactMap { $0 }
     }
 
+    func getConfiguration(withName name: String) -> FeedConfigurationDTO? {
+        FeedConfigurationEntity
+            .getFeedConfiguration(withName: name)?
+            .toDTO
+    }
+
+    func getConfiguration(withUrlString urlString: String) -> FeedConfigurationDTO? {
+        nil
+    }
+
     func saveConfiguration(_ configuration: FeedConfigurationDTO) {
         FeedConfigurationEntity
             .addFeedConfiguration(

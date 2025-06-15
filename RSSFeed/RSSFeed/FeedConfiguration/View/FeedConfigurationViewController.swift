@@ -95,7 +95,10 @@ extension FeedConfigurationViewController: UICollectionViewDelegate {
             return
         }
 
-        let bottomSheetViewController: FeedConfigurationInputBottomSheetViewController = .init(reason: .edit(selectedItem), delegate: self)
+        let bottomSheetViewController: FeedConfigurationInputBottomSheetViewController = .init(
+            reason: .edit(selectedItem),
+            delegate: self,
+            useCase: FeedConfigurationUseCase(repository: FeedConfigurationLocalRepository(), feedLoader: FeedLoaderFeedKit()))
         bottomSheetViewController.modalPresentationStyle = .overCurrentContext
         collectionView.deselectItem(at: indexPath, animated: true)
         self.present(bottomSheetViewController, animated: false)
@@ -172,7 +175,10 @@ private extension FeedConfigurationViewController {
 
     @objc
     func addTapped() {
-        let bottomSheetViewController: FeedConfigurationInputBottomSheetViewController = .init(reason: .new, delegate: self)
+        let bottomSheetViewController: FeedConfigurationInputBottomSheetViewController = .init(
+            reason: .new,
+            delegate: self,
+            useCase: FeedConfigurationUseCase(repository: FeedConfigurationLocalRepository(), feedLoader: FeedLoaderFeedKit()))
         bottomSheetViewController.modalPresentationStyle = .overFullScreen
         self.present(bottomSheetViewController, animated: false)
     }
